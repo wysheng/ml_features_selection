@@ -10,5 +10,5 @@ public class FSResult {
     public int numOfFeatures;
     public String classifier;
     public String fsMethod;
-    public Evaluation result;
+    public Evaluation evaluation;
 }

@@ -20,11 +20,13 @@ public class Config {
 
     public static final int NUM_FOLDS = 10;
 
-    public List<String> datasetFilename;
+    public List<String> datasetFilenames;
+    public List<DatasetEntry> datasets;
     public boolean numFeaturesInPercent = true;
     public List<Integer> numOfFeatures = new ArrayList<>();
+    public int numFeaturesTotal = 0;
     public List<Classifier> classifiers = new ArrayList<>();
-    public List<AttributeEvaluator> attributeEvaluators = new ArrayList<>();
+    public List<ASEvaluation> attributeEvaluators = new ArrayList<>();
     public List<ASSearch> attributeRankers = new ArrayList<>();
 
 
@@ -50,6 +52,7 @@ public class Config {
     }
 
     private void setupAttributeSelectors() {
+
         attributeEvaluators.add(new CorrelationAttributeEval());
         attributeEvaluators.add(new InfoGainAttributeEval());
         attributeEvaluators.add(new PrincipalComponents());
