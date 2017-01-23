@@ -11,4 +11,10 @@ public class FSResult {
     public String classifier;
     public String fsMethod;
     public Evaluation evaluation;
+
+    public long durationFiltering;
+    public long durationCrossValidation;
+    public long durationTotal(){
+        return durationFiltering + durationCrossValidation;
+    }
 }

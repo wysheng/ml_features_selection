@@ -20,11 +20,9 @@ public class Config {
 
     public static final int NUM_FOLDS = 10;
 
-    public List<String> datasetFilenames;
     public List<DatasetEntry> datasets;
     public boolean numFeaturesInPercent = true;
     public List<Integer> numOfFeatures = new ArrayList<>();
-    public int numFeaturesTotal = 0;
     public List<Classifier> classifiers = new ArrayList<>();
     public List<ASEvaluation> attributeEvaluators = new ArrayList<>();
     public List<ASSearch> attributeRankers = new ArrayList<>();
@@ -42,6 +40,10 @@ public class Config {
         numOfFeatures.add(30);
         numOfFeatures.add(40);
         numOfFeatures.add(50);
+        numOfFeatures.add(60);
+        numOfFeatures.add(70);
+        numOfFeatures.add(50);
+        numOfFeatures.add(80);
     }
 
 
