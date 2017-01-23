@@ -30,12 +30,23 @@ public class FeatureMethodEvaluator implements IEvaluator {
 
     public void evaluate(List<FSResult> results) {
 
-        Map<String, XYDataset> datasetMap = getXYDataSetMap(results);
+        Map<String, XYDataset> accuracyMap = getXYDataSetMap(results, false);
+        Map<String, XYDataset> runtimeMap = getXYDataSetMap(results, true);
 
-        datasetMap.forEach((name, dataset) -> {
-            JFreeChart chart = createChart(name, dataset);
+
+        accuracyMap.forEach((name, dataset) -> {
+            JFreeChart chart = createChart(name, "# Features", "% rightly classified", true, dataset);
             try {
-                ChartUtilities.writeChartAsPNG(new FileOutputStream("output/"+name+"-LineGraph.png"), chart, 500, 500);
+                ChartUtilities.writeChartAsPNG(new FileOutputStream("output/"+name+"-LineGraphAccuracy.png"), chart, 500, 500);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        runtimeMap.forEach((name, dataset) -> {
+            JFreeChart chart = createChart(name, "# Features", "Runtime (ms)", false, dataset);
+            try {
+                ChartUtilities.writeChartAsPNG(new FileOutputStream("output/"+name+"-LineGraphRuntime.png"), chart, 500, 500);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -44,12 +55,12 @@ public class FeatureMethodEvaluator implements IEvaluator {
 
     }
 
-    private JFreeChart createChart(String title, XYDataset dataset) {
+    private JFreeChart createChart(String title, String xLabel, String yLabel, boolean relative, XYDataset dataset) {
         // create the chart...
         final JFreeChart chart = ChartFactory.createXYLineChart(
                 title,                    // chart title
-                "# Features",             // x axis label
-                "% rightly classified",   // y axis label
+                xLabel,                   // x axis label
+                yLabel,                   // y axis label
                 dataset,                  // data
                 PlotOrientation.VERTICAL,
                 true,                     // include legend
@@ -75,19 +86,29 @@ public class FeatureMethodEvaluator implements IEvaluator {
         renderer.setSeriesShapesVisible(1, false);
         plot.setRenderer(renderer);
 
+
         NumberAxis domain = (NumberAxis) plot.getDomainAxis();
         domain.setRange(0.00, 100.00);
         domain.setTickUnit(new NumberTickUnit(10.0));
         domain.setVerticalTickLabels(true);
-        NumberAxis range = (NumberAxis) plot.getRangeAxis();
-        range.setRange(0.0, 100.0);
-        range.setTickUnit(new NumberTickUnit(10.0));
+
+        if(relative) {
+            NumberAxis range = (NumberAxis) plot.getRangeAxis();
+            range.setRange(0.0, 100.0);
+            range.setTickUnit(new NumberTickUnit(10.0));
+        }
         // OPTIONAL CUSTOMISATION COMPLETED.
 
         return chart;
     }
 
-    private Map<String, XYDataset> getXYDataSetMap(List<FSResult> results) {
+    /**
+     *
+     * @param results
+     * @param runtime if true the runtime is analyzed, if false accuracy
+     * @return
+     */
+    private Map<String, XYDataset> getXYDataSetMap(List<FSResult> results, boolean runtime) {
         Map<String, XYDataset> datasetMap = new HashMap<>();
 
         //sort results by data set
@@ -118,9 +139,15 @@ public class FeatureMethodEvaluator implements IEvaluator {
                 noFeatureResults
                     .forEach((i, results1) -> {
 
-                        Double avrg = results1.stream()
-                            .collect(Collectors.averagingDouble(result -> result.evaluation.pctCorrect()));
 
+                        Double avrg;
+                        if (runtime) {
+                            avrg = results1.stream()
+                                .collect(Collectors.averagingDouble(FSResult::durationTotal));
+                        } else {
+                            avrg = results1.stream()
+                                .collect(Collectors.averagingDouble(result -> result.evaluation.pctCorrect()));
+                        }
 
                         //check if series already exists, if not create it
                         XYSeries series;
