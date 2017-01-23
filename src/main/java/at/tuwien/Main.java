@@ -1,5 +1,6 @@
-package com.company;
+package at.tuwien;
 
+import at.tuwien.evaluators.IEvaluator;
 import org.apache.commons.cli.*;
 import weka.attributeSelection.ASEvaluation;
 import weka.attributeSelection.Ranker;
@@ -11,15 +12,15 @@ import weka.core.converters.ConverterUtils;
 import weka.filters.Filter;
 import weka.filters.supervised.attribute.AttributeSelection;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.company.Config.NUM_FOLDS;
+import static at.tuwien.Config.NUM_FOLDS;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.exit;
-import static java.lang.System.setOut;
 
 public class Main {
 
@@ -29,6 +30,10 @@ public class Main {
         CommandLineParser parser = new DefaultParser();
         // automatically generate the help statement
         HelpFormatter formatter = new HelpFormatter();
+
+
+        File outputFile = new File("output");
+        outputFile.mkdir();
 
         Option numFeaturesOpt = new Option(
                 "n",
@@ -84,8 +89,6 @@ public class Main {
                 config.datasets.get(i).classIndex = Integer.parseInt(classIndicesStrings.get(0));
             }
         }
-
-
 
 
 

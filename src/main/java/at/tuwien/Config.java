@@ -1,5 +1,7 @@
-package com.company;
+package at.tuwien;
 
+import at.tuwien.evaluators.FeatureMethodEvaluator;
+import at.tuwien.evaluators.IEvaluator;
 import weka.attributeSelection.*;
 import weka.classifiers.Classifier;
 import weka.classifiers.lazy.IBk;
@@ -8,9 +10,7 @@ import weka.classifiers.trees.RandomForest;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by elisabethappler on 22.01.17.
- */
+
 public class Config {
     private static Config ourInstance = new Config();
     public static Config getInstance() {

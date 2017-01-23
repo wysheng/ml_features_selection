@@ -1,4 +1,6 @@
-package com.company;
+package at.tuwien.evaluators;
+
+import at.tuwien.FSResult;
 
 import java.util.List;
 

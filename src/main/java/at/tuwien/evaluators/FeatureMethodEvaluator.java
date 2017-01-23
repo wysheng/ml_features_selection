@@ -1,5 +1,6 @@
-package com.company;
+package at.tuwien.evaluators;
 
+import at.tuwien.FSResult;
 import org.apache.commons.io.FilenameUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
@@ -9,13 +10,16 @@ import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.general.DatasetUtilities;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import java.awt.*;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.SyncFailedException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +33,8 @@ import java.util.stream.Collectors;
 public class FeatureMethodEvaluator implements IEvaluator {
 
     public void evaluate(List<FSResult> results) {
+
+        System.out.printf("Evaluating results...\n");
 
         Map<String, XYDataset> accuracyMap = getXYDataSetMap(results, false);
         Map<String, XYDataset> runtimeMap = getXYDataSetMap(results, true);
@@ -117,16 +123,13 @@ public class FeatureMethodEvaluator implements IEvaluator {
         plot.setRenderer(0, renderer);
 
 
-        NumberAxis domain = (NumberAxis) plot.getDomainAxis();
-        domain.setRange(0.00, 100.00);
-        domain.setTickUnit(new NumberTickUnit(10.0));
-        domain.setVerticalTickLabels(true);
-
-        if(relative) {
+        if(relative){
             NumberAxis range = (NumberAxis) plot.getRangeAxis();
             range.setRange(0.0, 100.0);
             range.setTickUnit(new NumberTickUnit(10.0));
+
         }
+//
         // OPTIONAL CUSTOMISATION COMPLETED.
 
         return chart;
@@ -155,6 +158,7 @@ public class FeatureMethodEvaluator implements IEvaluator {
         resultsByDataset
             .forEach((n, resultList) -> {
 
+            System.out.printf("Analysing %s for data set %s...\n", runtime ? "runtime": "accuracy", FilenameUtils.getBaseName(n));
             //sort results by method
             Map<String, List<FSResult>> resultsByMethod = resultList
                 .stream()
@@ -164,6 +168,8 @@ public class FeatureMethodEvaluator implements IEvaluator {
             Map<String, XYSeries> seriesMap = new HashMap<>();
             resultsByMethod
             .forEach((fsmethod, fsResults) -> {
+
+                System.out.printf("Analysing FS method %s for data set %s...\n", fsmethod, FilenameUtils.getBaseName(n));
 
                 //sort results by number of features
                 Map<Integer, List<FSResult>> noFeatureResults = fsResults
