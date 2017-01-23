@@ -1,4 +1,4 @@
-package com.company;
+package at.tuwien;
 
 import org.jfree.ui.ApplicationFrame;
 

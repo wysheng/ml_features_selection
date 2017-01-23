@@ -1,4 +1,4 @@
-package com.company;
+package at.tuwien;
 
 /**
  * Created by lukas on 1/22/17.
