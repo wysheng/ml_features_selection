@@ -1,5 +1,6 @@
-package com.company;
+package at.tuwien.evaluators;
 
+import at.tuwien.FSResult;
 import org.apache.commons.io.FilenameUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
@@ -9,13 +10,16 @@ import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.general.DatasetUtilities;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import java.awt.*;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.SyncFailedException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,15 +92,16 @@ public class FeatureMethodEvaluator implements IEvaluator {
 
 
         NumberAxis domain = (NumberAxis) plot.getDomainAxis();
-        domain.setRange(0.00, 100.00);
         domain.setTickUnit(new NumberTickUnit(10.0));
         domain.setVerticalTickLabels(true);
 
-        if(relative) {
+        if(relative){
             NumberAxis range = (NumberAxis) plot.getRangeAxis();
             range.setRange(0.0, 100.0);
             range.setTickUnit(new NumberTickUnit(10.0));
+
         }
+//
         // OPTIONAL CUSTOMISATION COMPLETED.
 
         return chart;
