@@ -30,6 +30,8 @@ public class FeatureMethodEvaluator implements IEvaluator {
 
     public void evaluate(List<FSResult> results) {
 
+        System.out.printf("Evaluating results...\n");
+
         Map<String, XYDataset> accuracyMap = getXYDataSetMap(results, false);
         Map<String, XYDataset> runtimeMap = getXYDataSetMap(results, true);
 
@@ -87,10 +89,10 @@ public class FeatureMethodEvaluator implements IEvaluator {
         plot.setRenderer(renderer);
 
 
-        NumberAxis domain = (NumberAxis) plot.getDomainAxis();
-        domain.setRange(0.00, 100.00);
-        domain.setTickUnit(new NumberTickUnit(10.0));
-        domain.setVerticalTickLabels(true);
+//        NumberAxis domain = (NumberAxis) plot.getDomainAxis();
+//        domain.setRange(0.00, 100.00);
+//        domain.setTickUnit(new NumberTickUnit(10.0));
+//        domain.setVerticalTickLabels(true);
 
         if(relative) {
             NumberAxis range = (NumberAxis) plot.getRangeAxis();
@@ -120,6 +122,7 @@ public class FeatureMethodEvaluator implements IEvaluator {
         resultsByDataset
             .forEach((n, resultList) -> {
 
+            System.out.printf("Analysing %s for data set %s...\n", runtime ? "runtime": "accuracy", FilenameUtils.getBaseName(n));
             //sort results by method
             Map<String, List<FSResult>> resultsByMethod = resultList
                 .stream()
@@ -129,6 +132,8 @@ public class FeatureMethodEvaluator implements IEvaluator {
             Map<String, XYSeries> seriesMap = new HashMap<>();
             resultsByMethod
             .forEach((fsmethod, fsResults) -> {
+
+                System.out.printf("Analysing FS method %s for data set %s...\n", fsmethod, FilenameUtils.getBaseName(n));
 
                 //sort results by number of features
                 Map<Integer, List<FSResult>> noFeatureResults = fsResults
