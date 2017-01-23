@@ -52,10 +52,26 @@ public class FeatureMethodEvaluator implements IEvaluator {
             }
         });
 
+        Map<String, XYDataset> accuracyMap2 = getXYDataSetMap(results, false, true);
+        Map<String, XYDataset> runtimeMap2 = getXYDataSetMap(results, true, true);
+
+        runtimeMap.keySet().forEach(key -> {
+            JFreeChart chart = createChart(key, "# Features", "% rightly classified", true, accuracyMap2.get(key), runtimeMap2.get(key), "Runtime (ms)");
+            try {
+                ChartUtilities.writeChartAsPNG(new FileOutputStream("output/"+key+"-LineGraphRuntimeAccuracy.png"), chart, 800, 800);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
 
     }
 
     private JFreeChart createChart(String title, String xLabel, String yLabel, boolean relative, XYDataset dataset) {
+        return createChart(title, xLabel, yLabel, relative, dataset, null, null);
+    }
+
+    private JFreeChart createChart(String title, String xLabel, String yLabel, boolean relative, XYDataset dataset, XYDataset dataset2, String yLabel2) {
         // create the chart...
         final JFreeChart chart = ChartFactory.createXYLineChart(
                 title,                    // chart title
@@ -81,10 +97,24 @@ public class FeatureMethodEvaluator implements IEvaluator {
         plot.setDomainGridlinePaint(Color.white);
         plot.setRangeGridlinePaint(Color.white);
 
+        if(dataset2 != null){
+            final NumberAxis axis2 = new NumberAxis(yLabel2);
+            axis2.setAutoRangeIncludesZero(false);
+            plot.setRangeAxis(1, axis2);
+            plot.setDataset(1, dataset2);
+            plot.mapDatasetToRangeAxis(1, 1);
+
+            final XYLineAndShapeRenderer renderer2 = new XYLineAndShapeRenderer();
+            renderer2.setSeriesLinesVisible(1, false);
+            renderer2.setSeriesShapesVisible(1, false);
+            plot.setRenderer(1,renderer2);
+        }
+
+
         final XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
         renderer.setSeriesLinesVisible(0, false);
         renderer.setSeriesShapesVisible(1, false);
-        plot.setRenderer(renderer);
+        plot.setRenderer(0, renderer);
 
 
         NumberAxis domain = (NumberAxis) plot.getDomainAxis();
@@ -102,13 +132,18 @@ public class FeatureMethodEvaluator implements IEvaluator {
         return chart;
     }
 
+    private Map<String, XYDataset> getXYDataSetMap(List<FSResult> results, boolean runtime) {
+        return getXYDataSetMap(results, runtime, false);
+    }
+
     /**
      *
      * @param results
      * @param runtime if true the runtime is analyzed, if false accuracy
+     * @param addTopicString 'Accuracy' or 'Runtime' is added to FSmethod
      * @return
      */
-    private Map<String, XYDataset> getXYDataSetMap(List<FSResult> results, boolean runtime) {
+    private Map<String, XYDataset> getXYDataSetMap(List<FSResult> results, boolean runtime, boolean addTopicString) {
         Map<String, XYDataset> datasetMap = new HashMap<>();
 
         //sort results by data set
@@ -154,7 +189,7 @@ public class FeatureMethodEvaluator implements IEvaluator {
                         if (seriesMap.containsKey(fsmethod)) {
                             series = seriesMap.get(fsmethod);
                         } else {
-                            series = new XYSeries(fsmethod);
+                            series = new XYSeries(fsmethod  + (addTopicString ? runtime ? " Runtime" : " Accuracy" : ""));
                             seriesMap.put(fsmethod, series);
                         }
 
