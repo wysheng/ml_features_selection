@@ -95,6 +95,7 @@ public class Main {
         }
 
 
+        List<FSResult> results = new ArrayList<>();
         for(FSResult result : fsResults){
             System.out.println("Dataset: " + result.datasetName +
                     "\nNumber of Features: " + result.numOfFeatures +
@@ -102,8 +103,14 @@ public class Main {
                     "\nClassifier: " + result.classifier);
             System.out.println(result.evaluation.pctCorrect());
             System.out.println(result.evaluation.pctIncorrect());
+            results.add(result);
 //            System.out.println(result.evaluation.toSummaryString());
 //            System.out.println(result.evaluation.toClassDetailsString());
+        }
+
+        //print diagrams
+        for (IEvaluator evaluator: config.resultEvaluators) {
+            evaluator.evaluate(results);
         }
 
     }

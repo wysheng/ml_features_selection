@@ -26,12 +26,18 @@ public class Config {
     public List<Classifier> classifiers = new ArrayList<>();
     public List<ASEvaluation> attributeEvaluators = new ArrayList<>();
     public List<ASSearch> attributeRankers = new ArrayList<>();
+    public List<IEvaluator> resultEvaluators = new ArrayList<>();
 
 
     private Config() {
         setupDefaultFeatureNums();
         setupClassifiers();
         setupAttributeSelectors();
+        setupResultEvaluators();
+    }
+
+    private void setupResultEvaluators() {
+        resultEvaluators.add(new FeatureMethodEvaluator());
     }
 
     private void setupDefaultFeatureNums() {
