@@ -17,7 +17,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.company.Config.NUM_FOLDS;
+import static java.lang.System.currentTimeMillis;
 import static java.lang.System.exit;
+import static java.lang.System.setOut;
 
 public class Main {
 
@@ -38,8 +40,7 @@ public class Main {
                 "c",
                 "classIndex",
                 true,
-                "specifies class indicies, separated by ','");
-        classIndicesOpt.isRequired();
+                "specifies class indicies, separated by ','. Per default this will assume the last attribute as the class");
 
         Options options = new Options();
         options.addOption(numFeaturesOpt);
@@ -76,24 +77,33 @@ public class Main {
             }
         }
 
-        List<String> classIndicesStrings = Arrays.asList(commandLine.getOptionValue('c').split(","));
-
-        for(int i = 0; i < classIndicesStrings.size(); ++i){
-            config.datasets.get(i).classIndex = Integer.parseInt(classIndicesStrings.get(0));
+        //Defaults to last attribute of dataset if not set
+        if(commandLine.hasOption('c')){
+            List<String> classIndicesStrings = Arrays.asList(commandLine.getOptionValue('c').split(","));
+            for(int i = 0; i < classIndicesStrings.size(); ++i){
+                config.datasets.get(i).classIndex = Integer.parseInt(classIndicesStrings.get(0));
+            }
         }
-
 
 
 
 
 
         for(DatasetEntry dataset : config.datasets){
+            System.out.println("Evaluating dataset: " + dataset.datasetFile);
             evaluateDataset(dataset);
         }
 
+
         for(FSResult result : fsResults){
-            System.out.println(result.evaluation.toSummaryString());
-            System.out.println(result.evaluation.toClassDetailsString());
+            System.out.println("Dataset: " + result.datasetName +
+                    "\nNumber of Features: " + result.numOfFeatures +
+                    "\nFSMethod: " + result.fsMethod +
+                    "\nClassifier: " + result.classifier);
+            System.out.println(result.evaluation.pctCorrect());
+            System.out.println(result.evaluation.pctIncorrect());
+//            System.out.println(result.evaluation.toSummaryString());
+//            System.out.println(result.evaluation.toClassDetailsString());
         }
 
     }
@@ -101,9 +111,12 @@ public class Main {
     private static void evaluateDataset(DatasetEntry dataset) throws Exception {
         ConverterUtils.DataSource source = new ConverterUtils.DataSource(dataset.datasetFile);
         Instances data = source.getDataSet();
+        if(dataset.classIndex == 0){
+            dataset.classIndex = data.numAttributes() -1;
+        }
         data.setClassIndex(dataset.classIndex);
 
-
+        System.out.println("#Evaluating Baseline");
         //RUN WITHOUT ATTRIBUTE SELECTION
         List<FSResult> initialResults = runAllClassifiers(data);
         initialResults = initialResults.parallelStream()
@@ -121,7 +134,9 @@ public class Main {
                 absNumberFeat = (int)(data.numAttributes()*(numFeat/100.0f));
             }
 
+            System.out.println("#Evaluating for " + absNumberFeat + " Features now");
             for(ASEvaluation attributeEvaluator : Config.getInstance().attributeEvaluators){
+                System.out.println("##Using " + attributeEvaluator.getClass().getSimpleName());
                 Ranker ranker = new Ranker();
                 ranker.setNumToSelect(absNumberFeat);
 
@@ -129,18 +144,23 @@ public class Main {
                 filter.setEvaluator(attributeEvaluator);
                 filter.setSearch(ranker); // entry 0 is the default Ranker
                 filter.setInputFormat(data);
+
+                long filteringStartTime = System.currentTimeMillis();
                 Instances reducedSet = Filter.useFilter(data, filter);
+                long filterDuration = currentTimeMillis() - filteringStartTime;
+                System.out.println("--Filtering took " + filterDuration + " millis");
 
                 List<FSResult> singleFsMethodResults = runAllClassifiers(reducedSet);
                 int finalAbsNumberFeat = absNumberFeat;
-                initialResults = initialResults.parallelStream()
+                singleFsMethodResults = singleFsMethodResults.parallelStream()
                         .map(i -> {
                             i.fsMethod = attributeEvaluator.getClass().getSimpleName();
                             i.numOfFeatures = finalAbsNumberFeat;
                             i.datasetName = dataset.datasetFile;
+                            i.durationFiltering = filterDuration;
                             return i; })
                         .collect(Collectors.toList());
-                fsResults.addAll(initialResults);
+                fsResults.addAll(singleFsMethodResults);
             }
         }
 
@@ -153,6 +173,7 @@ public class Main {
         List<FSResult> resultList = new ArrayList<>();
         for(Classifier classifier : Config.getInstance().classifiers){
             resultList.add(runClassifier(classifier, data));
+
         }
         return resultList;
     }
@@ -160,15 +181,21 @@ public class Main {
 
 
     public static FSResult runClassifier(Classifier classifier, Instances data) throws Exception {
+        System.out.println("###Running " + classifier.getClass().getSimpleName());
+        long classificationStartTime = currentTimeMillis();
+
         classifier.buildClassifier(data);
 
         Evaluation eval = new Evaluation(data);
         Debug.Random rand = new Debug.Random(1);  // using seed = 1
         eval.crossValidateModel(classifier, data, NUM_FOLDS, rand);
+        long classificationDuration = currentTimeMillis() - classificationStartTime;
 
         FSResult result = new FSResult();
         result.classifier = classifier.getClass().getSimpleName();
         result.evaluation = eval;
+        result.durationCrossValidation = classificationDuration;
+        System.out.println("---Classification took " + classificationDuration + " millis");
         return result;
     }
 

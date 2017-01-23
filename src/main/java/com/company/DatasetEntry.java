@@ -10,5 +10,6 @@ public class DatasetEntry {
     }
 
     String datasetFile;
-    int classIndex;
+    //defaulting to 0, then picking the last attribute as class index
+    int classIndex = 0;
 }
