@@ -50,7 +50,7 @@ public class PerClassifierRuntimeEvaluator implements IEvaluator {
         );
 
         JFreeChart barChart = ChartFactory.createBarChart(
-                "Accuracy by Classifier and Featureselection method - #Features " + String.valueOf(resultList.get(0).numOfFeatures),
+                "Runtime by Classifier and Featureselection method - #Features " + String.valueOf(resultList.get(0).numOfFeatures),
                 "#Features", "%Runtime",
                 dataset, PlotOrientation.VERTICAL,
                 true, true, false);
