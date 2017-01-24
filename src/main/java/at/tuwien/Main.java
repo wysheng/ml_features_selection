@@ -2,6 +2,7 @@ package at.tuwien;
 
 import at.tuwien.evaluators.IEvaluator;
 import org.apache.commons.cli.*;
+import org.apache.commons.io.FilenameUtils;
 import weka.attributeSelection.ASEvaluation;
 import weka.attributeSelection.Ranker;
 import weka.classifiers.Classifier;
@@ -34,6 +35,7 @@ public class Main {
 
         File outputFile = new File("output");
         outputFile.mkdir();
+        outputFile = null;
 
         Option numFeaturesOpt = new Option(
                 "n",
@@ -93,6 +95,9 @@ public class Main {
 
 
         for(DatasetEntry dataset : config.datasets){
+            outputFile = new File("output/" + FilenameUtils.getBaseName(dataset.datasetFile));
+            outputFile.mkdir();
+            outputFile = null;
             System.out.println("Evaluating dataset: " + dataset.datasetFile);
             evaluateDataset(dataset);
         }

@@ -43,7 +43,7 @@ public class FeatureMethodEvaluator implements IEvaluator {
         accuracyMap.forEach((name, dataset) -> {
             JFreeChart chart = createChart(name, "# Features", "% rightly classified", true, dataset);
             try {
-                ChartUtilities.writeChartAsPNG(new FileOutputStream("output/"+name+"-LineGraphAccuracy.png"), chart, 500, 500);
+                ChartUtilities.writeChartAsPNG(new FileOutputStream("output/"+name+"/LineGraphAccuracy.png"), chart, 500, 500);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -52,7 +52,7 @@ public class FeatureMethodEvaluator implements IEvaluator {
         runtimeMap.forEach((name, dataset) -> {
             JFreeChart chart = createChart(name, "# Features", "Runtime (ms)", false, dataset);
             try {
-                ChartUtilities.writeChartAsPNG(new FileOutputStream("output/"+name+"-LineGraphRuntime.png"), chart, 500, 500);
+                ChartUtilities.writeChartAsPNG(new FileOutputStream("output/"+name+"/LineGraphRuntime.png"), chart, 500, 500);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -64,7 +64,7 @@ public class FeatureMethodEvaluator implements IEvaluator {
         runtimeMap.keySet().forEach(key -> {
             JFreeChart chart = createChart(key, "# Features", "% rightly classified", true, accuracyMap2.get(key), runtimeMap2.get(key), "Runtime (ms)");
             try {
-                ChartUtilities.writeChartAsPNG(new FileOutputStream("output/"+key+"-LineGraphRuntimeAccuracy.png"), chart, 800, 800);
+                ChartUtilities.writeChartAsPNG(new FileOutputStream("output/"+key+"/LineGraphRuntimeAccuracy.png"), chart, 800, 800);
             } catch (IOException e) {
                 e.printStackTrace();
             }

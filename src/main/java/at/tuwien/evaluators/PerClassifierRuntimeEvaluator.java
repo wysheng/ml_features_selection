@@ -3,7 +3,6 @@ package at.tuwien.evaluators;
 import at.tuwien.FSResult;
 import org.apache.commons.io.FilenameUtils;
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
@@ -11,16 +10,15 @@ import org.jfree.data.category.DefaultCategoryDataset;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
- * Created by lukas on 1/23/17.
+ * Created by Lukas on 24.01.2017.
  */
-public class PerClassifierAccuracyEvaluator implements IEvaluator{
+public class PerClassifierRuntimeEvaluator implements IEvaluator {
+
     @Override
     public void evaluate(List<FSResult> results) {
         results.parallelStream()
@@ -40,12 +38,12 @@ public class PerClassifierAccuracyEvaluator implements IEvaluator{
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
         resultList.forEach(
-                res -> dataset.addValue(res.evaluation.pctCorrect(), res.classifier, res.fsMethod)
+                res -> dataset.addValue(res.durationTotal(), res.classifier, res.fsMethod)
         );
 
         JFreeChart barChart = ChartFactory.createBarChart(
                 "Accuracy by Classifier and Featureselection method - #Features " + String.valueOf(resultList.get(0).numOfFeatures),
-                "#Features", "%Accuracy",
+                "#Features", "%Runtime",
                 dataset, PlotOrientation.VERTICAL,
                 true, true, false);
         return barChart;
@@ -58,7 +56,7 @@ public class PerClassifierAccuracyEvaluator implements IEvaluator{
         int height = 600; /* Height of the image */
         String basename = FilenameUtils.getBaseName(datasetName);
 
-        File BarChart = new File( "output/"+ basename + "/" + numFeat +"-BarChartPerClassfierAccuracy.png" );
+        File BarChart = new File( "output/"+ basename + "/" + numFeat +"-BarChartPerClassfierRuntime.png" );
         try {
             ChartUtilities.saveChartAsPNG( BarChart , chart , width , height );
 
@@ -66,5 +64,4 @@ public class PerClassifierAccuracyEvaluator implements IEvaluator{
             e.printStackTrace();
         }
     }
-
 }
