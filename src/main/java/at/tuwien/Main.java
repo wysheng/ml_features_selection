@@ -112,7 +112,7 @@ public class Main {
         }
 
         //print diagrams
-        for (IEvaluator evaluator: config.resultEvaluators) {
+        for (IEvaluator evaluator : config.resultEvaluators) {
             evaluator.evaluate(results);
         }
 
