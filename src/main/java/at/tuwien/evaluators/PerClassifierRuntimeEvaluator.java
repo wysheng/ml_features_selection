@@ -5,8 +5,14 @@ import org.apache.commons.io.FilenameUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.labels.ItemLabelAnchor;
+import org.jfree.chart.labels.ItemLabelPosition;
+import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
+import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.ui.TextAnchor;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +38,8 @@ public class PerClassifierRuntimeEvaluator implements IEvaluator {
         Map<Integer, List<FSResult>> resultsPerFeatureNum = resultList.stream().collect(Collectors.groupingBy(r -> r.numOfFeatures));
         resultsPerFeatureNum.forEach((k,v) -> saveChartToImage(resultList.get(0).datasetName, k, createBarChart(v)));
 
+
+
     }
 
     public JFreeChart createBarChart(List<FSResult> resultList){
@@ -46,6 +54,15 @@ public class PerClassifierRuntimeEvaluator implements IEvaluator {
                 "#Features", "%Runtime",
                 dataset, PlotOrientation.VERTICAL,
                 true, true, false);
+
+        CategoryItemRenderer renderer = ((CategoryPlot)barChart.getPlot()).getRenderer();
+
+        renderer.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator());
+        renderer.setBaseItemLabelsVisible(true);
+        ItemLabelPosition position = new ItemLabelPosition(ItemLabelAnchor.OUTSIDE12,
+                TextAnchor.TOP_CENTER);
+        renderer.setBasePositiveItemLabelPosition(position);
+
         return barChart;
     }
 

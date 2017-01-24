@@ -6,8 +6,14 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.labels.ItemLabelAnchor;
+import org.jfree.chart.labels.ItemLabelPosition;
+import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
+import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.ui.TextAnchor;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,11 +49,22 @@ public class PerClassifierAccuracyEvaluator implements IEvaluator{
                 res -> dataset.addValue(res.evaluation.pctCorrect(), res.classifier, res.fsMethod)
         );
 
+
+
         JFreeChart barChart = ChartFactory.createBarChart(
                 "Accuracy by Classifier and Featureselection method - #Features " + String.valueOf(resultList.get(0).numOfFeatures),
                 "#Features", "%Accuracy",
                 dataset, PlotOrientation.VERTICAL,
                 true, true, false);
+
+        CategoryItemRenderer renderer = ((CategoryPlot)barChart.getPlot()).getRenderer();
+
+        renderer.setBaseItemLabelGenerator(new StandardCategoryItemLabelGenerator());
+        renderer.setBaseItemLabelsVisible(true);
+        ItemLabelPosition position = new ItemLabelPosition(ItemLabelAnchor.OUTSIDE12,
+                TextAnchor.TOP_CENTER);
+        renderer.setBasePositiveItemLabelPosition(position);
+
         return barChart;
     }
 

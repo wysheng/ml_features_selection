@@ -3,6 +3,7 @@ package at.tuwien;
 import at.tuwien.evaluators.FeatureMethodEvaluator;
 import at.tuwien.evaluators.IEvaluator;
 import at.tuwien.evaluators.PerClassifierAccuracyEvaluator;
+import at.tuwien.evaluators.PerClassifierRuntimeEvaluator;
 import weka.attributeSelection.*;
 import weka.classifiers.Classifier;
 import weka.classifiers.functions.SMO;
@@ -41,7 +42,7 @@ public class Config {
     private void setupResultEvaluators() {
         resultEvaluators.add(new FeatureMethodEvaluator());
         resultEvaluators.add(new PerClassifierAccuracyEvaluator());
-
+        resultEvaluators.add(new PerClassifierRuntimeEvaluator());
     }
 
     private void setupDefaultFeatureNums() {
@@ -52,7 +53,6 @@ public class Config {
         numOfFeatures.add(50);
         numOfFeatures.add(60);
         numOfFeatures.add(70);
-        numOfFeatures.add(50);
         numOfFeatures.add(80);
     }
 
