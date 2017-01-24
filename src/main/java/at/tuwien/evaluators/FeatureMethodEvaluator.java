@@ -111,8 +111,6 @@ public class FeatureMethodEvaluator implements IEvaluator {
             plot.mapDatasetToRangeAxis(1, 1);
 
             final XYLineAndShapeRenderer renderer2 = new XYLineAndShapeRenderer();
-            renderer2.setSeriesLinesVisible(1, false);
-            renderer2.setSeriesShapesVisible(1, false);
             plot.setRenderer(1,renderer2);
         }
 
